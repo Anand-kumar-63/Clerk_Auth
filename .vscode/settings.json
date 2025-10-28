@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.css": "css",
+        "algorithm": "c",
+        "iterator": "c",
+        "xhash": "c",
+        "xmemory": "c",
+        "xtree": "c",
+        "xutility": "c"
+    }
+}
