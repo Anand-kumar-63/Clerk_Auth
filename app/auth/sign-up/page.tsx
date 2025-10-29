@@ -12,9 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSignUp } from "@clerk/nextjs";
-import { redirect, useRouter } from "next/navigation";
-import { CarTaxiFront, Flag } from "lucide-react";
-import { asyncWrapProviders } from "async_hooks";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 const Signuppage = () => {
