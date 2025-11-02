@@ -59,14 +59,18 @@ export async function GET(req: NextRequest) {
         subscriptionEnds: true,
       },
     });
+    if (!ExistingUser) {
+      return NextResponse.json("user not exist", { status: 401 });
+    }
     const subscription = new Date();
+
     if (
       ExistingUser.isSubscribed == true &&
-      ExistingUser.subscriptionEnds < subscription
+      ExistingUser.subscriptionEnds! < subscription
     ) {
       const updateuserSubscription = await client.user.update({
         where: {
-          Id: userId,
+          id: userId,
         },
         data: {
           isSubscribed: false,

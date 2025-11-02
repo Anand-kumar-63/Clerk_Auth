@@ -19,7 +19,7 @@ model User {
   username         String    @unique
   email            String    @unique
   isSubscribed     Boolean   @default(false)
-  subscriptionEnds DateTime?
+  subscriptionEnds DateTime? 
   todos            todo[]
 }
 
