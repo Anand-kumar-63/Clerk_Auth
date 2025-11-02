@@ -2,6 +2,9 @@ import { NextResponse, NextRequest } from "next/server";
 import { clerkClient, getAuth, auth } from "@clerk/nextjs/server";
 import client from "@/lib/Prisma";
 import { messageInRaw } from "svix";
+import { abortOnSynchronousPlatformIOAccess } from "next/dist/server/app-render/dynamic-rendering";
+import { use } from "react";
+import { CarTaxiFront } from "lucide-react";
 
 // to check weather the user with is admin or not
 const isadmin = async (userId: string) => {
@@ -78,8 +81,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
+interface CreateTodoRequestBody {
+  title: string;
+  subject:string; 
+  id:string
+}
 export async function POST(req: NextRequest) {
-  // current active user's userId
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json(
@@ -91,88 +98,60 @@ export async function POST(req: NextRequest) {
       }
     );
   }
-
-  // check for the admin
-  if (!isadmin(userId)) {
-    return NextResponse.json(
-      {
-        message: "Forbidden",
-      },
-      {
-        status: 401,
-      }
-    );
-  }
-
   try {
-    const { todoId, todocompleted, email, isSubscribed } = await req.json();
-
-    if (todoId !== undefined && todocompleted !== undefined) {
-      // update the todo
-      const updatedtodo = await client.todo.update({
-        where: { id: todoId },
-        data: {
-          isCompleted: todocompleted,
-        },
-      });
-      return NextResponse.json(updatedtodo);
-    } else if (isSubscribed !== undefined) {
-      const updateduser = await client.user.update({
-        where: { email: email },
-        data: {
-          isSubscribed,
-          subscriptionEnds: isSubscribed
-            ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            : null,
-        },
-      });
-      return NextResponse.json({
-        updateduser,
-      });
-    }
-    return NextResponse.json(
-      {
-        message: "iinvalid request",
+    // checking if the user exists or not
+    const existinguser = await client.user.findUnique({
+      where: {
+        id: userId,
       },
-      {
-        status: 401,
-      }
-    );
-  } catch (erorr) {
-    return NextResponse.json(
-      {
-        message: "Internal server Error",
+      include: {
+        todos: true,
       },
-      {
-        status: 401,
-      }
-    );
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-   const { userId } = getAuth(req);
-
-   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-   }
-
-  if (!(await isadmin(userId))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  try {
-    const { todoId } = await req.json();
-
-    await client.todo.delete({
-      where: { id: todoId },
     });
+    if (!existinguser) {
+      return NextResponse.json(
+        {
+          Error: "User doesnt exist",
+        },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json({ message: "Todo deleted successfully" });
+    if (existinguser.isSubscribed == false && existinguser.todos.length >= 3) {
+      return NextResponse.json(
+        {
+          error:
+            "Free users can only create upto three todos , Take subscription to create more",
+        },
+        { status: 401 }
+      );
+    }
+    // type casting the object as {title:string , subject:string}
+    const todobody = (await req.json()) as CreateTodoRequestBody
+    const {title , subject} = todobody;
+    const newtodo = await client.todo.create({
+      data:{
+        userId:userId,
+        title:title,
+        subject:subject
+      } 
+    })
+    return NextResponse.json({
+      newtodo:newtodo
+    },{
+      status:200
+    })
+
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+      {
+        Error: error,
+      },
+      {
+        status: 401,
+      }
     );
   }
+  return 
 }

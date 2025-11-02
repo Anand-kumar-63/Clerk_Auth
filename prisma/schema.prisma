@@ -23,10 +23,11 @@ model User {
   todos            todo[]
 }
 
+
 model todo {
-  id          String   @id @db.Uuid
+  id          String   @id @default(uuid())
   title       String
-  subject     String
+  subject     String   @default("subject")
   isCompleted Boolean  @default(false)
   userId      String   @db.Uuid
   User        User?    @relation(fields: [userId], references: [id])
