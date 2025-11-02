@@ -1,11 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-
 const isDashboardRoute = createRouteMatcher(['/dashboard(.*)',"/"])
 const isAdminRoute = createRouteMatcher(['/admin(.*)'])
-
 export default clerkMiddleware(async (auth, req) => {
    const { isAuthenticated, redirectToSignIn } = await auth();
-
+   const { userId } = await auth();
    // Restrict admin route to users with specific role
    // if (isAdminRoute(req)) await auth.protect({ role: 'admin' })
    if(isAdminRoute(req)){
@@ -13,16 +11,15 @@ export default clerkMiddleware(async (auth, req) => {
       return has({permission:"admin"})
     })
    }
-  
+   if(!userId){
+     return redirectToSignIn();
+   }
   // Restrict dashboard routes to signed in users
   // if (isDashboardRoute(req)) await auth.protect()
   if(!isAuthenticated && isDashboardRoute(req)){
        return redirectToSignIn();
   }
-
-
 })
-
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params

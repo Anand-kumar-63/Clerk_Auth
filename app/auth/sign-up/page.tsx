@@ -70,11 +70,10 @@ const Signuppage = () => {
         await setActive({ session: completeSignup.createdSessionId });
         router.push("/dashboard");
       }
-    } catch (error: any) {
+    }catch (error: any) {
       console.log(JSON.stringify(error));
       seterror(error.error[0].message);
-    }
-  }
+    }}
   return (
     <Card>
       <CardHeader>

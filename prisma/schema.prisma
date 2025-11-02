@@ -15,11 +15,12 @@ datasource db {
 }
 
 model User {
-  id           String  @id @db.Uuid
-  username     String  @unique
-  email        String  @unique
-  isSubscribed Boolean @default(false)
-  todos        todo[]
+  id               String    @id @db.Uuid
+  username         String    @unique
+  email            String    @unique
+  isSubscribed     Boolean   @default(false)
+  subscriptionEnds DateTime?
+  todos            todo[]
 }
 
 model todo {
