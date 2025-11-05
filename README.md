@@ -66,3 +66,9 @@ read more - https://www.prisma.io/docs/orm/more/help-and-troubleshooting/nextjs-
 - setup of sign-up page.tsx using the clerk api and make it custom
 
 # Middleware 
+
+
+
+# React-toastify 
+Does not accept object even after type augumentation because react need something that it can render at run time and show on the screen object can not be converted into the string 
+react toastify only accepts string or reactnodes or null
