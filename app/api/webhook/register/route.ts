@@ -23,15 +23,15 @@ export async function POST(req: NextRequest) {
   // };
   // const payload = '{"test": 2432232314}';
   // sivx_timestamp and svix_id and svix_signature to verify the webhook later
+
   const svix_timestamp = (await webhookpayheader).get("svix-timestamp");
   const svix_id = (await webhookpayheader).get("svix-id");
   const svix_signature = (await webhookpayheader).get("svix-signature");
 
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error occurred -- no svix headers", {
+    return new Response("Error occurred -- no svix headers",{
       status: 400,
-    });
-  }
+    });}
 
   // now ectract the payload that contains all the data , metadata
   const payload = await req.json();
@@ -52,14 +52,9 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.log("error verifying the webhook", error);
     return NextResponse.json(
-      {
-        message: "error occured",
-      },
-      {
-        status: 401,
-      }
-    );
-  }
+      {message: "error occured",},
+      { status: 401,});}
+
   // now evt got the data about the user
   const { id } = evt.data;
   // to check the type of the event
@@ -70,6 +65,7 @@ export async function POST(req: NextRequest) {
   if (eventType == "user.created") {
     try {
       const { email_addresses, primary_email_address_id } = evt.data;
+      // emails addresses array[] of mutiple userid
       console.log(evt.data);
       const primary_email = email_addresses.find(
         (email) => email.id === primary_email_address_id
@@ -80,9 +76,11 @@ export async function POST(req: NextRequest) {
         console.error("No primary email found");
         return new Response("No primary email found", { status: 401 });
       }
+
       // new user creation
-      const newuser = await client.User.create({
-        data: {
+      const newuser = await client.user.create({
+        data:{
+          username:"",
           id: evt.data.id,
           email: primary_email.email_address,
           isSubscribed: false,
