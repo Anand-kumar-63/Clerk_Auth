@@ -9,7 +9,7 @@ async function isAdmin(userId: string) {
 }
 
 export async function GET(req: NextRequest) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId || !(await isAdmin(userId))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   try {
     let user;
     if (email) {
-      user = await prisma.user.findUnique({
+      user = await client.user.findUnique({
         where: { email },
         include: {
           todos: {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     }
 
     const totalItems = email
-      ? await prisma.todo.count({ where: { user: { email } } })
+      ? await client.todo.count({ where: { user: { email } } })
       : 0;
     const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
       await req.json();
 
     if (isSubscribed !== undefined) {
-      await prisma.user.update({
+      await client.user.update({
         where: { email },
         data: {
           isSubscribed,
@@ -72,7 +72,7 @@ export async function PUT(req: NextRequest) {
     }
 
     if (todoId) {
-      await prisma.todo.update({
+      await client.todo.update({
         where: { id: todoId },
         data: {
           completed: todoCompleted !== undefined ? todoCompleted : undefined,
