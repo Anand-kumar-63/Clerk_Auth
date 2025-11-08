@@ -10,12 +10,15 @@ async function isAdmin(userId: string) {
 }
 
 export async function GET(req: NextRequest) {
+  
   const { userId } = await auth();
   if (!userId || !(await isAdmin(userId))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });}
   const { searchParams } = new URL(req.url);
+
   const email = searchParams.get("email");
   const page = parseInt(searchParams.get("page") || "1");
+  
   try {
     let user;
     if (email) {

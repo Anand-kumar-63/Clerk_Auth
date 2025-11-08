@@ -6,7 +6,7 @@ import client from "@/lib/Prisma";
 import { AppPortalAccessInSerializer } from "svix/dist/models/appPortalAccessIn";
 
 export async function PUT(
-  req: NextRequest,
+   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { userId } = await auth();

@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json({
       isSubscribed:ExistingUser.isSubscribed,
-      SubscriptionEnds:ExistingUser.subscriptionEnds;
+      SubscriptionEnds:ExistingUser.subscriptionEnds,
     })
   } catch (error) {
     return NextResponse.json({ message: error }, { status: 402 });

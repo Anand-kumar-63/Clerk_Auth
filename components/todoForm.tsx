@@ -8,6 +8,9 @@ const TodoForm = ({ submit }: TodoFormprops) => {
   const [title, settitle] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (title.trim()) {
+      submit(title.trim());
+    }
   };
   return (
     <div className="flex flex-col items-center">
