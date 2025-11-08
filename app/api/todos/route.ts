@@ -18,20 +18,20 @@ export async function GET(req: NextRequest) {
   try {
     const todos = await client.todo.findMany({
       where: {
-        userId,
+        id:userId,
         title: {
-          contains: search,
-          mode: "insensitive",
+          contains:search,
+          mode:"insensitive",
         },
       },
-      orderBy: { CreatedAt: "desc" },
+      orderBy:{ CreatedAt: "desc" },
       take: ITEMS_PER_PAGE,
       skip: (page - 1) * ITEMS_PER_PAGE,
     });
 
     const totalItems = await client.todo.count({
       where: {
-        userId,
+        userId:userId,
         title: {
           contains: search,
           mode:"insensitive",
@@ -56,14 +56,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
-
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
+  
   const user = await client.user.findUnique({
-    where: { id: userId },
-    include: { todos: true },
+    where:{ id: userId },
+    include:{ todos: true },
   });
 
   console.log("User:", user);
@@ -86,6 +85,5 @@ export async function POST(req: NextRequest) {
   const todo = await client.todo.create({
     data: { title, userId },
   });
-
   return NextResponse.json(todo, { status: 201 });
 }

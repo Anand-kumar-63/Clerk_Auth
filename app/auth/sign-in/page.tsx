@@ -1,8 +1,7 @@
+"use client"
 import { CarTaxiFront, Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
-import { useRouter } from "next/router";
-import { NextRequest, NextResponse } from "next/server";
-import { clerkClient, EmailAddress } from "@clerk/nextjs/server";
+import { useRouter } from "next/navigation";
 import { useSignIn } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,19 +15,19 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { setReactDebugChannel } from "next/dist/server/dev/debug-channel";
-import { RESPONSE_LIMIT_DEFAULT } from "next/dist/server/api-utils";
+
 const Signinpage = () => {
+  const router = useRouter();
   const { isLoaded, setActive, signIn } = useSignIn();
   const [emailAddress, setemailAddress] = useState("");
   const [password, setpassword] = useState("");
   const [showpassword, setshowpassword] = useState(false);
   const [error, seterror] = useState("");
-
   if (!isLoaded) {
     return null;
   }
-  const router = useRouter();
+
+  
   async function handlesubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isLoaded) {
@@ -100,7 +99,6 @@ const Signinpage = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
             <button
               type="submit"
               className="px-4 py-1 bg-green-400 text-white mt-2"
@@ -113,7 +111,7 @@ const Signinpage = () => {
           <p>Don't have an account? </p>
           <Link href={"/sign-up"}>
             <span className="text-blue-500 hover:underline text-sm">
-              Sign-up
+              Sign-in
             </span>
           </Link>
         </CardFooter>

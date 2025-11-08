@@ -38,54 +38,58 @@ export default function App() {
       </div>
     );
   };
-  const fetchtodos = useCallback(
-    async (currentpage: number) => {
-      notify({
-          desc: "Fetching todos Please wait...",
-      });
-      setisloading(true);
-      try {
-        const todos = await fetch(
-          `/api/todos?page=${currentpage}&search=${debouncesearchquery}`,
-          {
-            method: "GET",
-            headers: { "Content-type": "application/json" },
-          }
-        );
-        if (!todos) {
-          notify({
-            Error: "Api not working",
-            desc: "Error in fetching the Todos",
-          });
-        }
-        const data = await todos.json();
-        console.log(data);
-        setTodos(data.todos);
-        setcurrentpage(data.currentPage);
-        settotalpages(data.totalPages);
-      } catch (error) {
-        notify({
-          Error: "Internal Server Error",
-          desc: "Error in fetching the Todos",
-        });
-      } finally {
-        setisloading(false);
-      }
-    },
-    [debouncesearchquery]
-  );
-  const fetchsubscriptionStatus = async () => {
-    const respone = await fetch("/api/subscription");
-    if (respone.ok) {
-      const data = await respone.json();
-      setisSubscribed(data.isSubscribed);
-    }
-  };
-  useEffect(() => {
-    fetchtodos(1);
-    fetchsubscriptionStatus();
+  // const fetchtodos = useCallback(
+  //   async (currentpage: number) => {
+  //     notify({
+  //       desc: "Fetching todos Please wait...",
+  //     });
+  //     setisloading(true);
+  //     try {
+  //       const todos = await fetch(
+  //         `/api/todos?page=${currentpage}&search=${debouncesearchquery}`,
+  //         {
+  //           method: "GET",
+  //           headers: { "Content-type": "application/json" },
+  //         }
+  //       );
+  //       if (!todos) {
+  //         notify({
+  //           Error: "Api not working",
+  //           desc: "Error in fetching the Todos",
+  //         });
+  //       }
+  //       const data = await todos.json();
+  //       console.log(data);
+  //       setTodos(data.todos);
+  //       setcurrentpage(data.currentPage);
+  //       settotalpages(data.totalPages);
+  //     } catch (error) {
+  //       notify({
+  //         Error: "Internal Server Error",
+  //         desc: "Error in fetching the Todos",
+  //       });
+  //     } finally {
+  //       setisloading(false);
+  //     }
+  //   },
+  //   [debouncesearchquery]
+  // );
+  // const fetchsubscriptionStatus = async () => {
+  //   const respone = await fetch("/api/subscription", {
+  //     method: "GET",
+  //     headers: { "Content-Type": "application/json" },
+  //   });
 
-  }, [fetchtodos]);
+  //   if(respone.ok) {
+  //     const data = await respone.json();
+  //     setisSubscribed(data.isSubscribed);
+  //   }
+
+  // };
+  // useEffect(() => {
+  //   fetchtodos(1);
+  //   fetchsubscriptionStatus();
+  // }, [fetchtodos]);
   const handleaddtodos = async (title: string) => {
     notify({
       title: "Adding Todo",
@@ -103,7 +107,7 @@ export default function App() {
       if (!Response) {
         throw new Error("Error in creating a todo");
       } else if (Response.ok) {
-        await fetchtodos(currentpage);
+        // await fetchtodos(currentpage);
         notify({
           desc: "Todo Added",
         });
@@ -136,7 +140,7 @@ export default function App() {
           desc: "",
         });
       }
-      await fetchtodos(currentpage);
+      // await fetchtodos(currentpage);
       notify({
         title: "Success",
         desc: "Todo updated successfully.",
@@ -154,7 +158,7 @@ export default function App() {
       if (!respone.ok) {
         throw new Error("Error in deleting the todo");
       }
-      await fetchtodos(currentpage);
+      // await fetchtodos(currentpage);
       notify({
         desc: "Todo deleted successfully",
       });
@@ -177,7 +181,7 @@ export default function App() {
           <TodoForm submit={(title) => handleaddtodos(title)}></TodoForm>
         </CardContent>
       </Card>
-      {!isSubscribed && Todos.length > 3 && (
+      {/* {!isSubscribed && Todos.length > 3 && (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
@@ -186,7 +190,8 @@ export default function App() {
             to add more..
           </AlertDescription>
         </Alert>
-      )}
+      )} */}
+      {/*       
       <Card>
         <CardHeader>
           <CardTitle>your todos</CardTitle>
@@ -218,15 +223,15 @@ export default function App() {
                   />
                 ))}
               </ul>
-              <Pagination
+              {/* <Pagination
                 currentpage={currentpage}
                 totalpages={totalpages}
-                onpagechange={(page) => fetchtodos(page)}
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+                // onpagechange={(page) => fetchtodos(page)}
+              /> */}
+      {/* </>
+          )} */}
+      {/*   </CardContent> */}
+      {/*  </Card> */}
     </div>
   );
 }
