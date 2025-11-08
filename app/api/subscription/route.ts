@@ -79,14 +79,18 @@ export async function GET(req: NextRequest) {
       });
       return NextResponse.json(
         {
-          message: "Subscriptions Ends",
-          subscriptionEnds: ExistingUser.subscriptionEnds,
+          isSubsribed:false,
+          SubscriptionEnds: null,
         },
         {
           status: 200,
         }
       );
     }
+    return NextResponse.json({
+      isSubscribed:ExistingUser.isSubscribed,
+      SubscriptionEnds:ExistingUser.subscriptionEnds;
+    })
   } catch (error) {
     return NextResponse.json({ message: error }, { status: 402 });
   }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import client from "@/lib/Prisma";
 import { CarTaxiFront } from "lucide-react";
+import { todo } from "node:test";
 const ITEMS_PER_PAGE = 10;
 
 async function isAdmin(userId: string) {
@@ -52,7 +53,18 @@ export async function PUT(req: NextRequest) {
   try {
     const { email, isSubscribed, todoId, todoCompleted, todoTitle } =
       await req.json();
-    if (isSubscribed !== undefined) {
+
+    // updating the todo
+    if (todoId !== "undefined" && todoCompleted !== "undefined") {
+      const updatetodo = await client.todo.update({
+        where: { id: todoId },
+        data: {
+          isCompleted: todoCompleted,
+        },
+      });
+      return NextResponse.json(updatetodo, { status: 200 });
+    }
+    else if(isSubscribed !== "undefined"){
       await client.user.update({
         where: { email },
         data: {
@@ -61,9 +73,9 @@ export async function PUT(req: NextRequest) {
             ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             : null,
         },
-      });
-    }
-    if (todoId) {
+      });}
+     // 
+    else if(todoId) {
       await client.todo.update({
         where: { id: todoId },
         data: {

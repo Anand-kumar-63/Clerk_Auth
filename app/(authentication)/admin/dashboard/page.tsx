@@ -1,25 +1,29 @@
 import React, { useState, useTransition, useCallback, useEffect } from "react";
 import { todo, User } from "@prisma/client";
-import todoItem from "@/components/todoItem";
+import TodoForm from "@/components/TodoForm";
+import TodoItem from "@/components/TodoItem";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import pagination from "@/components/pagination";
+import Pagination from "@/components/Pagination";
 import { ToastContainer, toast } from "react-toastify";
 import { useDebounceValue } from "usehooks-ts";
 import { error } from "console";
 import { currentUser } from "@clerk/nextjs/server";
 import { verify } from "crypto";
 import { Input } from "@/components/ui/input";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// import pagination from "@/components/pagination";
 interface userwithtodos extends User {
   todo: todo[];
 }
 const Admindashboard = async ({ todo }: userwithtodos) => {
   const [email, setemail] = useState("");
   const [debounceemail, setdebounceemail] = useDebounceValue("", 300);
-  const [User, setUser] = useState<userwithtodos | null>(null);
+  const [user, setuser   ] = useState<userwithtodos | null>(null);
   const [isloading, setisloading] = useState(false);
   const [currentpage, setcurrentpage] = useState(1);
-  const [totoalpages, settotalpages] = useState(1);
+  const [totalpages, settotalpages] = useState(1);
 
   const notify = (Toastmessage: {
     Error?: string;
@@ -46,10 +50,10 @@ const Admindashboard = async ({ todo }: userwithtodos) => {
         );
         if (!Response.ok) throw new Error("Error in fetching the data");
         const data = await Response.json();
-        setUser(data.user);
+        setuser(data.user);
         setcurrentpage(data.currentpage);
-        settotalpages(data.currentpage);
-        notify({ title: "success", message: "Dat fetched successfully" });
+        settotalpages(data.totalPages);
+        notify({ title: "success", message: "User Data fetched successfully" });
       } catch (error) {
         console.log("Error:", error);
         notify({ title: "failed", message: "Error in fetching the user todo" });
@@ -79,7 +83,7 @@ const Admindashboard = async ({ todo }: userwithtodos) => {
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
           email: debounceemail,
-          isSubscribed: !User?.isSubscribed,
+          isSubscribed: !user?.isSubscribed,
         }),
       });
       if (!response.ok) throw new Error("Failed to update subscription");
@@ -96,33 +100,36 @@ const Admindashboard = async ({ todo }: userwithtodos) => {
       });
     }
   };
-  const HandleUpdatesubscription = async () => {
-    notify({ title: "Updating subscription", message: "Please wait...." });
-    try {
-      const updatedtodo = await fetch("/api/admin", {
-        method: "PUT",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify({
-          email: debounceemail,
-          isSubscribed: !User?.isSubscribed,
-        }),
-      });
-      if (!updatedtodo)
-        throw new Error("Error in updating the subscription please try again");
-      fetchuserdata(currentpage);
-      notify({
-        title: "Success",
-        message: "Subscription updated successfully.",
-      });
-    } catch (error) {
-      notify({
-        Error: "Error",
-        title: "Admin dashboard Error",
-        message: "Error in updating the Todo",
-      });
-    }
-  };
 
+  const HandleUpdatetodo = async(id:string,completed:Boolean)=>{
+    if(!id || !completed){
+      throw new Error(`userId and completed is Required`);
+    } 
+    try{
+  const Response = await fetch("/api/admin",{
+    method:"PUT",
+    headers:{"Content-type":"application/json"},
+    body:JSON.stringify({
+      email:debounceemail,
+      todoId:id,
+      todoCompleted:completed
+    })
+  });
+
+      if (!Response.ok) throw new Error("Failed to update todo");
+      fetchuserdata(currentpage);
+      notify({ title:"Success", message: "Todo updated successfully." });
+
+} 
+      catch(error){
+           notify({
+            Error:"Error",
+            title:"Error in updating the todo",
+            message:"Internal server Error"
+           })
+      }   
+  }
+  
   const handleDeletetodo = async (todoId: string) => {
     notify({
       title: "Deleting todo",
@@ -148,99 +155,99 @@ const Admindashboard = async ({ todo }: userwithtodos) => {
       });
     }
   };
-  return;
-  <div className="container mx-auto p-4 max-w-3xl mb-8">
-    <h1 className="text-3xl font-bold mb-8 text-center">Admin Dashboard</h1>
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Search User</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSearch} className="flex space-x-2">
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setemail(e.target.value)}
-            placeholder="Enter user email"
-            required
-          />
-          <Button type="submit">Search</Button>
-        </form>
-      </CardContent>
-    </Card>
 
-    {isloading ? (
-      <Card>
-        <CardContent className="text-center py-8">
-          <p className="text-muted-foreground">Loading user data...</p>
+  return (
+    <div className="container mx-auto p-4 max-w-3xl mb-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">Admin Dashboard</h1>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Search User</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSearch} className="flex space-x-2">
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+              placeholder="Enter user email"
+              required
+            />
+            <Button type="submit">Search</Button>
+          </form>
         </CardContent>
       </Card>
-    ) : User ? (
-      <>
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>User Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Email: {User?.email}</p>
-            <p>
-              Subscription Status:{" "}
-              {User?.isSubscribed ? "Subscribed" : "Not Subscribed"}
-            </p>
-            {User?.subscriptionEnds && (
-              <p>
-                Subscription Ends:{" "}
-                {new Date(User?.subscriptionEnds).toLocaleDateString()}
-              </p>
-            )}
-            <Button onClick={handelupdatesubscription} className="mt-2">
-              {User?.isSubscribed ? "Cancel Subscription" : "Subscribe User"}
-            </Button>
+
+      {isloading ? (
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-muted-foreground">Loading user data...</p>
           </CardContent>
         </Card>
-
-        {User?.todo.length > 0 ? (
-          <Card>
+      ) : user ? (
+        <>
+          <Card className="mb-8">
             <CardHeader>
-              <CardTitle>User Todos</CardTitle>
+              <CardTitle>User Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-4">
-                {User?.todo.map((todo) => (
-                  <todoItem
-                    key={todo.id}
-                    todo={todo}
-                    isAdmin={true}
-                    onUpdate={handleUpdateTodo}
-                    onDelete={handleDeleteTodo}
-                  />
-                ))}
-              </ul>
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(page) => fetchUserData(page)}
-              />
+              <p>Email: {user.email}</p>
+              <p>
+                Subscription Status:{" "}
+                {user.isSubscribed ? "Subscribed" : "Not Subscribed"}
+              </p>
+              {user.subscriptionEnds && (
+                <p>
+                  Subscription Ends:{" "}
+                  {new Date(user.subscriptionEnds).toLocaleDateString()}
+                </p>
+              )}
+              <Button onClick={handelupdatesubscription} className="mt-2">
+                {user.isSubscribed ? "Cancel Subscription" : "Subscribe User"}
+              </Button>
             </CardContent>
           </Card>
-        ) : (
-          <Card>
-            <CardContent className="text-center py-8">
-              <p className="text-muted-foreground">This user has no todos.</p>
-            </CardContent>
-          </Card>
-        )}
-      </>
-    ) : debouncedEmail ? (
-      <Card>
-        <CardContent className="text-center py-8">
-          <p className="text-muted-foreground">
-            No user found with this email.
-          </p>
-        </CardContent>
-      </Card>
-    ) : null}
-  </div>;
-};
 
-export default Admindashboard;
+          {user.todo.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>User Todos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-4">
+                  {user.todo.map((todo) => (
+                    <TodoItem
+                      key={todo.id}
+                      todo={todo}
+                      isAdmin={true}
+                      onUpdate={HandleUpdatetodo}
+                      onDelete={handleDeletetodo}
+                    />
+                  ))}
+                </ul>
+                <Pagination
+                  currentpage={currentpage}
+                  totalpages={totalpages}
+                  onpagechange={(currentPage) => fetchuserdata(currentPage)}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="text-center py-8">
+                <p className="text-muted-foreground">This user has no todos.</p>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      ) : debounceemail ? (
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-muted-foreground">
+              No user found with this email.
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
+  );
+};

@@ -12,15 +12,8 @@ interface Todoitemprops {
   onUpdate: (id: string, completed: Boolean) => void;
   onDelete: (id: string) => void;
 }
-
-const todoItem = ({
-  todo,
-  isAdmin = false,
-  onUpdate,
-  onDelete,
-}: Todoitemprops) => {
+const TodoItem = ({todo , isAdmin = false , onUpdate , onDelete }: Todoitemprops) => {
   const [iscompleted, setiscompleted] = useState(todo.isCompleted);
-
   const togglecomplete = async () => {
     const newcompletedstate = !iscompleted;
     setiscompleted(newcompletedstate);
@@ -65,4 +58,4 @@ const todoItem = ({
   );
 };
 
-export default todoItem;
+export default TodoItem;

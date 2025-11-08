@@ -5,7 +5,7 @@ interface paginationprops {
   totalpages: number;
   onpagechange: (page: number) => void;
 }
-const pagination = ({
+const Pagination = ({
   currentpage,
   totalpages,
   onpagechange,
@@ -32,4 +32,4 @@ const pagination = ({
   );
 };
 
-export default pagination;
+export default Pagination;

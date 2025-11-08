@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-interface todoFormprops {
+interface TodoFormprops {
   submit: (title: string) => void;
 }
-const todoForm = ({ submit }: todoFormprops) => {
+const TodoForm = ({ submit }: TodoFormprops) => {
   const [title, settitle] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,4 +25,4 @@ const todoForm = ({ submit }: todoFormprops) => {
     </div>
   );
 };
-export default todoForm;
+export default TodoForm;

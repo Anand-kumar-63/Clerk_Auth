@@ -33,6 +33,7 @@ export async function PUT(
     if (userId != todo.userId) {
       return NextResponse.json("Not authorised", { status: 401 });
     }
+
     const updatedtodo = await client.todo.update({
       where: {
         id: todoid,
@@ -41,6 +42,7 @@ export async function PUT(
         isCompleted: completed,
       },
     });
+    
     return NextResponse.json("todo updated successdfully", { status: 200 });
   } catch (error) {
     return NextResponse.json(

@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
       );
       console.log("primary_email", primary_email);
       console.log("Email Addresss", primary_email?.email_address);
+      
       if (!primary_email) {
         console.error("No primary email found");
         return new Response("No primary email found", { status: 401 });
@@ -104,3 +105,78 @@ export async function POST(req: NextRequest) {
     }
   );
 }
+
+
+/*  Return object from the webhook payload 
+{
+  "id": "user_sample_123",
+  "object": "user",
+  "first_name": "Maren",
+  "last_name": "Philips",
+  "name": "Maren Philips",
+  "has_image": true,
+  "image_url": "https://images.clerk.dev/static/sample-avatar.png",
+  "primary_email_address_id": "eml_123",
+  "password_enabled": true,
+  "passkeys": [],
+  "two_factor_enabled": false,
+  "email_addresses": [
+    {
+      "id": "eml_123",
+      "object": "email_address",
+      "email_address": "maren.philips@example.com",
+      "verification": {
+        "status": "verified",
+        "strategy": "email_link",
+        "attempts": 0,
+        "expire_at": 1762584822345,
+        "error": null
+      },
+      "linked_to": [],
+      "created_at": 1762152222345,
+      "updated_at": 1762584222345
+    }
+  ],
+  "phone_numbers": [],
+  "web3_wallets": [],
+  "external_accounts": [
+    {
+      "id": "ext_123",
+      "object": "external_account",
+      "provider": "oauth_google",
+      "identification_id": "idn_123",
+      "provider_user_id": "prov_123",
+      "approved_scopes": "email,profile",
+      "email_address": "maren.philips@example.com",
+      "first_name": "Maren",
+      "last_name": "Philips",
+      "avatar_url": "https://images.clerk.dev/static/sample-avatar.png",
+      "public_metadata": {},
+      "created_at": 1760856222345,
+      "updated_at": 1762584222345
+    }
+  ],
+  "enterprise_accounts": [],
+  "public_metadata": {
+    "role": "member",
+    "feature_flag": "sample_only"
+  },
+  "private_metadata": {
+    "internal_note": "This is a sample user constructed from settings"
+  },
+  "unsafe_metadata": {},
+  "last_sign_in_at": 1762577022345,
+  "last_active_at": 1762583322345,
+  "created_at": 1754808222345,
+  "updated_at": 1762584222345,
+  "banned": false,
+  "locked": false,
+  "lockout_expires_in_seconds": null,
+  "delete_self_enabled": true,
+  "create_organization_enabled": true,
+  "create_organizations_limit": null,
+  "totp_enabled": false,
+  "backup_code_enabled": false,
+  "legal_accepted_at": null
+}
+*/
